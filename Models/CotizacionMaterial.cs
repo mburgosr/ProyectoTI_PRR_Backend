@@ -10,6 +10,6 @@ namespace ProyectoTI_PRR_Backend.Models
 
         // Relaciones con las tablas cotizaciones y materiales
         public Cotizacion Cotizacion { get; set; }
-        public Material Material { get; set; }
+        public Materiales Material { get; set; }
     }
 }

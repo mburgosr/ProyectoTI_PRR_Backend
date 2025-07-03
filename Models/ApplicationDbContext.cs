@@ -7,7 +7,7 @@ public class ApplicationDbContext : DbContext
 
     // DbSets para las entidades
     public DbSet<Cliente> Clientes { get; set; }
-    public DbSet<Material> Materiales { get; set; }
+    public DbSet<Materiales> Materiales { get; set; }
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<CotizacionMaterial> CotizacionMateriales { get; set; }
 
@@ -16,7 +16,7 @@ public class ApplicationDbContext : DbContext
     {
         modelBuilder.Entity<Cliente>()
         .HasKey(c => c.Cedula);
-        modelBuilder.Entity<Material>()
+        modelBuilder.Entity<Materiales>()
         .HasKey(c => c.Codigo);
         modelBuilder.Entity<Cotizacion>()
         .HasKey(c => c.NumeroCot);
@@ -36,7 +36,7 @@ public class ApplicationDbContext : DbContext
             .Property(c => c.Total)
             .HasColumnType("decimal(10, 2)");
 
-        modelBuilder.Entity<Material>()
+        modelBuilder.Entity<Materiales>()
             .Property(m => m.CostoSinIva)
             .HasColumnType("decimal(10, 2)");
 
