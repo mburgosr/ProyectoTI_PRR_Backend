@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProyectoTI_PRR_Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateClienteKey : Migration
+    public partial class AddFactura : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,7 @@ namespace ProyectoTI_PRR_Backend.Migrations
                 {
                     Codigo = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CostoSinIva = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CostoSinIva = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Tipo = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -47,9 +47,9 @@ namespace ProyectoTI_PRR_Backend.Migrations
                     NumeroCot = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ClienteCedula = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Iva = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    SubTotal = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Iva = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Total = table.Column<decimal>(type: "decimal(10,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,6 +60,28 @@ namespace ProyectoTI_PRR_Backend.Migrations
                         principalTable: "Clientes",
                         principalColumn: "Cedula",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Facturas",
+                columns: table => new
+                {
+                    IdFactura = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClienteCedula = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EstadoPago = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    ArchivoNombre = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Facturas", x => x.IdFactura);
+                    table.ForeignKey(
+                        name: "FK_Facturas_Clientes_ClienteCedula",
+                        column: x => x.ClienteCedula,
+                        principalTable: "Clientes",
+                        principalColumn: "Cedula",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,6 +118,11 @@ namespace ProyectoTI_PRR_Backend.Migrations
                 name: "IX_CotizacionMateriales_MaterialCodigo",
                 table: "CotizacionMateriales",
                 column: "MaterialCodigo");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Facturas_ClienteCedula",
+                table: "Facturas",
+                column: "ClienteCedula");
         }
 
         /// <inheritdoc />
@@ -103,6 +130,9 @@ namespace ProyectoTI_PRR_Backend.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CotizacionMateriales");
+
+            migrationBuilder.DropTable(
+                name: "Facturas");
 
             migrationBuilder.DropTable(
                 name: "Cotizaciones");

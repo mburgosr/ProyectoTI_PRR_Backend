@@ -10,6 +10,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Materiales> Materiales { get; set; }
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<CotizacionMaterial> CotizacionMateriales { get; set; }
+    public DbSet<Factura> Facturas { get; set; }
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

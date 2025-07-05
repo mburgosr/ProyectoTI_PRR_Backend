@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ProyectoTI_PRR_Backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250630072645_UpdateClienteKey")]
-    partial class UpdateClienteKey
+    [Migration("20250705020830_AddFactura")]
+    partial class AddFactura
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,13 +63,13 @@ namespace ProyectoTI_PRR_Backend.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("Iva")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.HasKey("NumeroCot");
 
@@ -96,13 +96,44 @@ namespace ProyectoTI_PRR_Backend.Migrations
                     b.ToTable("CotizacionMateriales");
                 });
 
-            modelBuilder.Entity("ProyectoTI_PRR_Backend.Models.Material", b =>
+            modelBuilder.Entity("ProyectoTI_PRR_Backend.Models.Factura", b =>
+                {
+                    b.Property<int>("IdFactura")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdFactura"));
+
+                    b.Property<string>("ArchivoNombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClienteCedula")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EstadoPago")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("IdFactura");
+
+                    b.HasIndex("ClienteCedula");
+
+                    b.ToTable("Facturas");
+                });
+
+            modelBuilder.Entity("ProyectoTI_PRR_Backend.Models.Materiales", b =>
                 {
                     b.Property<string>("Codigo")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("CostoSinIva")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10, 2)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -136,7 +167,7 @@ namespace ProyectoTI_PRR_Backend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ProyectoTI_PRR_Backend.Models.Material", "Material")
+                    b.HasOne("ProyectoTI_PRR_Backend.Models.Materiales", "Material")
                         .WithMany()
                         .HasForeignKey("MaterialCodigo")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -145,6 +176,17 @@ namespace ProyectoTI_PRR_Backend.Migrations
                     b.Navigation("Cotizacion");
 
                     b.Navigation("Material");
+                });
+
+            modelBuilder.Entity("ProyectoTI_PRR_Backend.Models.Factura", b =>
+                {
+                    b.HasOne("ProyectoTI_PRR_Backend.Models.Cliente", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteCedula")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
                 });
 #pragma warning restore 612, 618
         }
