@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProyectoTI_PRR_Backend.Models;
 
+
 public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -8,62 +9,38 @@ public class ApplicationDbContext : DbContext
     // DbSets para las entidades
     public DbSet<Cliente> Clientes { get; set; }
     public DbSet<Materiales> Materiales { get; set; }
+    public DbSet<Factura> Facturas { get; set; }
+    public DbSet<RegistroVolqueta> RegistroVolquetas{ get; set; }
+    public DbSet<ReporteDiario> ReportesDiarios { get; set; }
+    public DbSet<DetalleReporte> DetallesReporte { get; set; }
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<CotizacionMaterial> CotizacionMateriales { get; set; }
-    public DbSet<Factura> Facturas { get; set; }
-
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Cliente>()
-        .HasKey(c => c.Cedula);
+            .HasKey(c => c.Cedula);
+
         modelBuilder.Entity<Materiales>()
-        .HasKey(c => c.Codigo);
-        modelBuilder.Entity<Cotizacion>()
-        .HasKey(c => c.NumeroCot);
-        modelBuilder.Entity<CotizacionMaterial>()
-        .HasKey(c => c.CotizacionNumero);
-
-        // Configuración de las propiedades decimales con precisión y escala
-        modelBuilder.Entity<Cotizacion>()
-            .Property(c => c.SubTotal)
-            .HasColumnType("decimal(10, 2)");
-
-        modelBuilder.Entity<Cotizacion>()
-            .Property(c => c.Iva)
-            .HasColumnType("decimal(10, 2)");
-
-        modelBuilder.Entity<Cotizacion>()
-            .Property(c => c.Total)
-            .HasColumnType("decimal(10, 2)");
+            .HasKey(c => c.Codigo);
 
         modelBuilder.Entity<Materiales>()
             .Property(m => m.CostoSinIva)
             .HasColumnType("decimal(10, 2)");
 
-        // Relaciones entre entidades
+        modelBuilder.Entity<ReporteDiario>()
+            .HasMany(r => r.Detalles)
+            .WithOne(d => d.ReporteDiario!)
+            .HasForeignKey(d => d.ReporteDiario_Id)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<Cotizacion>()
-            .HasOne(c => c.Cliente)
-            .WithMany()
-            .HasForeignKey(c => c.ClienteCedula)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<CotizacionMaterial>()
-            .HasKey(cm => new { cm.CotizacionNumero, cm.MaterialCodigo });
-
-        modelBuilder.Entity<CotizacionMaterial>()
-            .HasOne(cm => cm.Cotizacion)
-            .WithMany()
-            .HasForeignKey(cm => cm.CotizacionNumero)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<CotizacionMaterial>()
-            .HasOne(cm => cm.Material)
-            .WithMany()
-            .HasForeignKey(cm => cm.MaterialCodigo)
-            .OnDelete(DeleteBehavior.Restrict);
-
+       .HasMany(c => c.Materiales)
+       .WithOne(m => m.Cotizacion!)
+       .HasForeignKey(m => m.CotizacionId)
+       .OnDelete(DeleteBehavior.Cascade);
     }
+
 }
 

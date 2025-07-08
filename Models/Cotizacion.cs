@@ -4,14 +4,21 @@ namespace ProyectoTI_PRR_Backend.Models
 {
     public class Cotizacion
     {
-        [Key] public string NumeroCot { get; set; }
-        public string ClienteCedula { get; set; }  // Relación con la tabla clientes
+        [Key]
+        public int CotizacionId { get; set; }
+
+        public string NumeroCot { get; set; } = string.Empty;
+
+        public string ClienteCedula { get; set; } = string.Empty;
+
         public DateTime Fecha { get; set; }
+
         public decimal SubTotal { get; set; }
-        public decimal Iva { get; set; }
+
+        public decimal IVA { get; set; }
+
         public decimal Total { get; set; }
 
-        // Relación con la tabla Cliente
-        public Cliente Cliente { get; set; }
+        public List<CotizacionMaterial> Materiales { get; set; } = new List<CotizacionMaterial>();
     }
 }

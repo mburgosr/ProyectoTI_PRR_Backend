@@ -95,4 +95,20 @@ using ProyectoTI_PRR_Backend.Models;
 
             return NoContent();  // Respuesta 204 (sin contenido) indica que el material fue eliminado con éxito
         }
-    }
+
+    [HttpGet("nombres")]
+public async Task<ActionResult<IEnumerable<Cliente>>> BuscarPorNombreOCedula([FromQuery] string term)
+{
+    if (string.IsNullOrWhiteSpace(term))
+        return BadRequest("Debe proporcionar un término de búsqueda.");
+
+    var resultados = await _context.Clientes
+        .Where(c => c.Nombre.Contains(term) || c.Cedula.Contains(term))
+        .Take(10)
+        .ToListAsync();
+
+    return Ok(resultados);
+}
+
+
+}

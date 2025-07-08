@@ -93,4 +93,6 @@ public class ClienteController : ControllerBase
 
         return NoContent();  // Respuesta 204 (sin contenido) indica que el cliente fue eliminado con éxito
     }
+
+    
 }
