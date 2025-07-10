@@ -60,6 +60,27 @@ namespace ProyectoTI_PRR_Backend.Controllers
             if (facturaExistente == null)
                 return NotFound();
 
+            // Sincronizar estado de pago con el pedido relacionado
+            var pedidoRelacionado = await _context.Pedidos.FirstOrDefaultAsync(p => p.FacturaId == facturaExistente.IdFactura);
+                if (pedidoRelacionado != null)
+                {
+                    pedidoRelacionado.EstadoPago = factura.EstadoPago;
+
+                    // Verificar si el pedido aún cumple las condiciones para estar Cerrado
+                    if (pedidoRelacionado.EstadoEntrega == "Entregado" && pedidoRelacionado.EstadoPago == "Cancelado")
+                    {
+                        pedidoRelacionado.EstadoPedido = "Cerrado";
+                    }
+                    else if (pedidoRelacionado.EstadoEntrega == "Cancelado")
+                    {
+                        pedidoRelacionado.EstadoPedido = "Cerrado";
+                    }
+                    else
+                    {
+                        pedidoRelacionado.EstadoPedido = "Abierto";
+                    }
+                }
+
             facturaExistente.Fecha = factura.Fecha;
             facturaExistente.ClienteCedula = factura.ClienteCedula;
             facturaExistente.EstadoPago = factura.EstadoPago;
