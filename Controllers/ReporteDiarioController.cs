@@ -54,7 +54,7 @@ namespace ProyectoTI_PRR_Backend.Controllers
                 _context.ReportesDiarios.Add(reporte);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { mensaje = "Reporte creado", id = reporte.ReporteDiario_Id });
+                return Ok(reporte);
             }
             catch (Exception ex)
             {
