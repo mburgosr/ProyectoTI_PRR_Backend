@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Cotizacion> Cotizaciones { get; set; }
     public DbSet<CotizacionMaterial> CotizacionMateriales { get; set; }
     public DbSet<Pedido> Pedidos { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
 
 
 
