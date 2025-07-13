@@ -12,22 +12,21 @@ namespace ProyectoTI_PRR_Backend.Models
         public string NumeroFactura { get; set; }
 
         [Required]
-        public int PedidoId { get; set; } // Foreign key to Pedido
+        public int PedidoId { get; set; }
 
         [Required]
         public DateTime Fecha { get; set; }
 
         [Required]
-        public string ClienteCedula { get; set; } // Foreign key to Cliente
+        public string ClienteCedula { get; set; }
 
         [Required]
-        public string EstadoPago { get; set; } // Pendiente, Cancelado
+        public string EstadoPago { get; set; }
 
-        public string? Archivo { get; set; } // Base64 string for PDF/Image
+        public string? Archivo { get; set; }
 
         public string? Observaciones { get; set; }
 
-        // Relaciones
         [ForeignKey("PedidoId")]
         public Pedido? Pedido { get; set; }
 

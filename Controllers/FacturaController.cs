@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProyectoTI_PRR_Backend.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ProyectoTI_PRR_Backend.Controllers
 {
@@ -44,13 +41,11 @@ namespace ProyectoTI_PRR_Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateFactura([FromBody] Factura factura)
         {
-            // Validar el modelo recibido del frontend
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // El NumeroFactura se genera en el backend para asegurar unicidad y secuencia
             if (string.IsNullOrEmpty(factura.NumeroFactura))
             {
                 factura.NumeroFactura = await GenerateNextFacturaNumber();
@@ -58,16 +53,12 @@ namespace ProyectoTI_PRR_Backend.Controllers
 
             try
             {
-                // Al agregar 'factura', EF Core automáticamente establecerá las relaciones
-                // si PedidoId y ClienteCedula corresponden a entidades existentes en la DB.
-                // No es necesario cargar explícitamente Pedido o Cliente aquí si solo se envían los IDs.
                 _context.Facturas.Add(factura);
                 await _context.SaveChangesAsync();
                 return Ok(factura);
             }
             catch (Exception ex)
             {
-                // Captura la excepción interna para un mejor diagnóstico
                 var innerExceptionMessage = ex.InnerException?.Message ?? ex.Message;
                 return StatusCode(500, $"Error al guardar la factura: {innerExceptionMessage}");
             }
@@ -84,7 +75,6 @@ namespace ProyectoTI_PRR_Backend.Controllers
 
             try
             {
-                // Al actualizar, EF Core también manejará las relaciones por los IDs.
                 _context.Entry(factura).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 return NoContent();
@@ -119,13 +109,12 @@ namespace ProyectoTI_PRR_Backend.Controllers
             return NoContent();
         }
 
-        // Helper para generar el número de factura secuencial
         private async Task<string> GenerateNextFacturaNumber()
         {
             var today = DateTime.Today;
             var prefix = $"FAC{today.Year}{today.Month:D2}{today.Day:D2}";
 
-            // Encuentra el último número de factura para hoy
+            // Encuentra el último número de factura
             var lastFactura = await _context.Facturas
                 .Where(f => f.NumeroFactura.StartsWith(prefix))
                 .OrderByDescending(f => f.NumeroFactura)
@@ -135,7 +124,6 @@ namespace ProyectoTI_PRR_Backend.Controllers
             int sequence = 1;
             if (lastFactura != null)
             {
-                // Extrae el número de secuencia del último número de factura
                 var lastSequenceStr = lastFactura.Substring(prefix.Length);
                 if (int.TryParse(lastSequenceStr, out int lastSequence))
                 {
