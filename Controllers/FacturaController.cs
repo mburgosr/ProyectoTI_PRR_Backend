@@ -55,6 +55,28 @@ namespace ProyectoTI_PRR_Backend.Controllers
             {
                 _context.Facturas.Add(factura);
                 await _context.SaveChangesAsync();
+
+                var pedidoToUpdate = await _context.Pedidos.FirstOrDefaultAsync(p => p.PedidoId == factura.PedidoId);
+                if (pedidoToUpdate != null)
+                {
+                    pedidoToUpdate.EstadoPago = factura.EstadoPago;
+
+                    if (pedidoToUpdate.EstadoEntrega == "Entregado" && pedidoToUpdate.EstadoPago == "Cancelado")
+                    {
+                        pedidoToUpdate.EstadoPedido = "Cerrado";
+                    }
+                    else if (pedidoToUpdate.EstadoEntrega == "Cancelado")
+                    {
+                        pedidoToUpdate.EstadoPedido = "Cerrado";
+                    }
+                    else
+                    {
+                        pedidoToUpdate.EstadoPedido = "Abierto";
+                    }
+
+                    _context.Entry(pedidoToUpdate).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
                 return Ok(factura);
             }
             catch (Exception ex)
@@ -73,10 +95,43 @@ namespace ProyectoTI_PRR_Backend.Controllers
                 return BadRequest("El ID de la factura no coincide.");
             }
 
+            var existingFactura = await _context.Facturas.AsNoTracking().FirstOrDefaultAsync(f => f.IdFactura == id);
+            if (existingFactura == null)
+            {
+                return NotFound();
+            }
+
+            var originalEstadoPago = existingFactura.EstadoPago;
+
             try
             {
                 _context.Entry(factura).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
+
+                if (originalEstadoPago != factura.EstadoPago)
+                {
+                    var pedidoToUpdate = await _context.Pedidos.FirstOrDefaultAsync(p => p.PedidoId == factura.PedidoId);
+
+                    if (pedidoToUpdate != null)
+                    {
+                        pedidoToUpdate.EstadoPago = factura.EstadoPago;
+                        if (pedidoToUpdate.EstadoEntrega == "Entregado" && pedidoToUpdate.EstadoPago == "Cancelado")
+                        {
+                            pedidoToUpdate.EstadoPedido = "Cerrado";
+                        }
+                        else if (pedidoToUpdate.EstadoEntrega == "Cancelado") // Si la entrega fue cancelada, el pedido también se cierra
+                        {
+                            pedidoToUpdate.EstadoPedido = "Cerrado";
+                        }
+                        else
+                        {
+                            pedidoToUpdate.EstadoPedido = "Abierto";
+                        }
+                        _context.Entry(pedidoToUpdate).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
                 return NoContent();
             }
             catch (DbUpdateConcurrencyException)
@@ -114,7 +169,6 @@ namespace ProyectoTI_PRR_Backend.Controllers
             var today = DateTime.Today;
             var prefix = $"FAC{today.Year}{today.Month:D2}{today.Day:D2}";
 
-            // Encuentra el último número de factura
             var lastFactura = await _context.Facturas
                 .Where(f => f.NumeroFactura.StartsWith(prefix))
                 .OrderByDescending(f => f.NumeroFactura)
