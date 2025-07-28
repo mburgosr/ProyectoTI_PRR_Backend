@@ -24,14 +24,16 @@ namespace ProyectoTI_PRR_Backend.Models
         public string EstadoEntrega { get; set; } 
 
         [Required]
-        public string EstadoPago { get; set; }     // Pendiente, Cancelado
+        public string EstadoPago { get; set; }
 
         [Required]
-        public string EstadoPedido { get; set; }   // Abierto, Cerrado
+        public string EstadoPedido { get; set; }
 
         public int? FacturaId { get; set; }
 
         public string? Observaciones { get; set; }
+
+        public int? VolquetaId { get; set; }
 
         // Relaciones
         [ForeignKey("CotizacionId")]
@@ -39,6 +41,9 @@ namespace ProyectoTI_PRR_Backend.Models
 
         [ForeignKey("ClienteCedula")]
         public Cliente? Cliente { get; set; }
+
+        [ForeignKey("VolquetaId")]
+        public RegistroVolqueta? Volqueta { get; set; }
 
         [ForeignKey("FacturaId")]
         public Factura? Factura { get; set; }

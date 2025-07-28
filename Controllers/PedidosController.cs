@@ -54,7 +54,15 @@ namespace ProyectoTI_PRR_Backend.Controllers
                 pedido.NumeroPedido = await GenerateNextPedidoNumber();
             }
 
-            if (string.IsNullOrEmpty(pedido.EstadoEntrega)) pedido.EstadoEntrega = "Pendiente";
+            if (pedido.VolquetaId.HasValue)
+            {
+                pedido.EstadoPedido = "En Curso";
+            }
+            else
+            {
+                pedido.EstadoPedido = "Pendiente";
+            }
+
             if (string.IsNullOrEmpty(pedido.EstadoPago)) pedido.EstadoPago = "Pendiente";
             if (string.IsNullOrEmpty(pedido.EstadoPedido)) pedido.EstadoPedido = "Abierto";
 
