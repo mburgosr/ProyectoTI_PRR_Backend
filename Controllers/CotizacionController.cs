@@ -22,7 +22,8 @@ namespace ProyectoTI_PRR_Backend.Controllers
             {
                 var cotizaciones = await _context.Cotizaciones
                     .Include(c => c.Materiales)
-                    .ToListAsync();
+                    .OrderByDescending(p => p.Fecha)
+                    .ToListAsync();             
 
                 return Ok(cotizaciones);
             }

@@ -23,6 +23,7 @@ namespace ProyectoTI_PRR_Backend.Controllers
                 .Include(p => p.Cotizacion)
                 .Include(p => p.Cliente)
                 .Include(p => p.Factura)
+                .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
         }
 

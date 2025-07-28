@@ -22,6 +22,7 @@ namespace ProyectoTI_PRR_Backend.Controllers
             return await _context.Facturas
                 .Include(f => f.Pedido)
                 .Include(f => f.Cliente)
+                .OrderByDescending(f => f.Fecha)
                 .ToListAsync();
         }
 
