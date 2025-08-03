@@ -56,11 +56,11 @@ namespace ProyectoTI_PRR_Backend.Controllers
 
             if (pedido.VolquetaId.HasValue)
             {
-                pedido.EstadoPedido = "En Curso";
+                pedido.EstadoEntrega = "En Curso";
             }
             else
             {
-                pedido.EstadoPedido = "Pendiente";
+                pedido.EstadoEntrega = "Pendiente";
             }
 
             if (string.IsNullOrEmpty(pedido.EstadoPago)) pedido.EstadoPago = "Pendiente";

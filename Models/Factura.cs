@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace ProyectoTI_PRR_Backend.Models
 {
@@ -32,5 +33,6 @@ namespace ProyectoTI_PRR_Backend.Models
 
         [ForeignKey("ClienteCedula")]
         public Cliente? Cliente { get; set; }
+        public ICollection<Pago>? Pagos { get; set; }
     }
 }
