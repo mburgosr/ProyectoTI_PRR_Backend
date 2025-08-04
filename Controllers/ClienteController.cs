@@ -17,7 +17,7 @@ public class ClienteController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
     {
-        return await _context.Clientes.ToListAsync();
+        return await _context.Clientes.OrderBy(c => c.Nombre).ToListAsync();
     }
 
     // GET: api/Cliente/{id}
