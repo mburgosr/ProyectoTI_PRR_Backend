@@ -27,7 +27,8 @@ namespace ProyectoTI_PRR_Backend.Controllers
                 .Include(f => f.Pedido)
                     .ThenInclude(p => p.Cotizacion) // Incluir Cotizacion a través de Pedido
                 .Include(f => f.Cliente)
-                .Include(f => f.Pagos) // NUEVO: Incluir los pagos
+                .Include(f => f.Pagos) // Incluir los pagos
+                .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
         }
 
@@ -37,9 +38,9 @@ namespace ProyectoTI_PRR_Backend.Controllers
         {
             var factura = await _context.Facturas
                 .Include(f => f.Pedido)
-                    .ThenInclude(p => p.Cotizacion) // NUEVO: Incluir Cotizacion para obtener el total
+                    .ThenInclude(p => p.Cotizacion) // Incluir Cotizacion para obtener el total
                 .Include(f => f.Cliente)
-                .Include(f => f.Pagos) // NUEVO: Incluir los pagos
+                .Include(f => f.Pagos) // Incluir los pagos
                 .FirstOrDefaultAsync(f => f.IdFactura == id);
 
             return factura == null ? NotFound() : Ok(factura);
@@ -59,7 +60,6 @@ namespace ProyectoTI_PRR_Backend.Controllers
                 factura.NumeroFactura = await GenerateNextFacturaNumber();
             }
 
-            // Asegurarse de que Pagos sea null o vacío para que EF no intente insertar pagos al crear la factura principal
             // Los pagos se añadirán/editarán en el método PUT si es necesario
             factura.Pagos = null;
 
@@ -90,8 +90,7 @@ namespace ProyectoTI_PRR_Backend.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // Recargar la factura para incluir los pagos si se añadieran en este mismo request (aunque la lógica actual los añade vía PUT)
-                // Opcional: Puedes devolver la factura recién creada sin pagos si no se esperan inmediatamente
+                // Se puede devolver la factura recién creada sin pagos si no se esperan inmediatamente
                 // return CreatedAtAction(nameof(GetFactura), new { id = factura.IdFactura }, factura);
                 return Ok(factura); // Devolver la factura creada
             }
@@ -128,15 +127,12 @@ namespace ProyectoTI_PRR_Backend.Controllers
             var originalPagos = existingFactura.Pagos?.ToList() ?? new List<Pago>();
             var incomingPagos = factura.Pagos?.ToList() ?? new List<Pago>();
 
-            // Limpiar la colección de Pagos de la factura entrante para que EF no intente procesarlos directamente
-            // La gestión de pagos se hará manualmente a continuación
             factura.Pagos = null;
 
             _context.Entry(factura).State = EntityState.Modified; // Marcar la factura principal como modificada
 
             try
             {
-                // --- Gestión de Pagos ---
                 // Eliminar pagos que no están en la lista entrante
                 foreach (var oldPago in originalPagos)
                 {
@@ -159,12 +155,11 @@ namespace ProyectoTI_PRR_Backend.Controllers
                         _context.Entry(newPago).State = EntityState.Modified;
                     }
                 }
-                // --- Fin Gestión de Pagos ---
 
                 await _context.SaveChangesAsync(); // Guardar cambios de factura y pagos
 
                 // --- Recalcular Estado de Pago de la Factura y Pedido ---
-                // Necesitamos el total de la cotización para determinar si la factura está "Cancelada"
+                // Total de la cotización para determinar si la factura está "Cancelada"
                 var cotizacionTotal = existingFactura.Pedido?.Cotizacion?.Total ?? 0;
                 var totalPagosRealizados = _context.Pagos.Where(p => p.FacturaId == factura.IdFactura).Sum(p => (decimal?)p.Monto) ?? 0;
 
@@ -209,7 +204,6 @@ namespace ProyectoTI_PRR_Backend.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
-                // --- Fin Recalcular Estado de Pago ---
 
                 return NoContent();
             }
