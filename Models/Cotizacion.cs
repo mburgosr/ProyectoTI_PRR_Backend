@@ -19,6 +19,8 @@ namespace ProyectoTI_PRR_Backend.Models
 
         public decimal Total { get; set; }
 
+        [Required]
+        public decimal PorcentIVA { get; set; } = 15.00m;
         public List<CotizacionMaterial> Materiales { get; set; } = new List<CotizacionMaterial>();
     }
 }

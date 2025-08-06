@@ -73,6 +73,7 @@ namespace ProyectoTI_PRR_Backend.Controllers
             existente.IVA = cotizacion.IVA;
             existente.Total = cotizacion.Total;
             existente.NumeroCot = cotizacion.NumeroCot;
+            existente.PorcentIVA = cotizacion.PorcentIVA;
 
             _context.CotizacionMateriales.RemoveRange(existente.Materiales);
 
